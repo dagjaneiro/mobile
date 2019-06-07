@@ -9,12 +9,15 @@ import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import RNFS from 'react-native-fs';
+import { unzip } from 'react-native-zip-archive'
+
 export default class ComponentView extends Component {
 
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = { editorPath: '' };
 
     this.loadStyles();
 
@@ -57,6 +60,9 @@ export default class ComponentView extends Component {
 
   reloadData() {
     this.editor = ModelManager.get().findItem(this.props.editorId);
+    if (this.editor.name === "Simple Task Editor") {
+      this.downloadEditor();
+    }
     this.note = ModelManager.get().findItem(this.props.noteId);
     ComponentManager.get().contextItemDidChangeInArea("editor-editor");
 
@@ -67,6 +73,30 @@ export default class ComponentView extends Component {
   componentWillUnmount() {
     ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
+  }
+
+  async downloadEditor() {
+    const downloadUrl = 'https://github.com/sn-extensions/simple-task-editor/archive/1.3.1.zip'
+    const downloadPath = `${RNFS.MainBundlePath}/editor.zip`
+    const extractFolder = `${RNFS.MainBundlePath}/editors`
+
+    // Check if we have already downloaded the editor
+    if (!await RNFS.exists(extractFolder)) {
+      console.log('downloading editor...')
+      await RNFS.downloadFile({
+        fromUrl: downloadUrl,
+        toFile: downloadPath
+      })
+      console.log('extracting archive...')
+      await unzip(downloadPath, extractFolder)
+    } else {
+      console.log('editor already downloaded.')
+    }
+
+    // Read the path to the editor
+    const dir = await RNFS.readDir(extractFolder)
+    console.log('editor directory:', dir[0].path)
+    this.setState({ editorPath: 'file://' + dir[0].path + '/dist/index.html' })
   }
 
   onMessage = (message) => {
@@ -153,8 +183,8 @@ export default class ComponentView extends Component {
 
   render() {
     var editor = this.editor;
-    var url = ComponentManager.get().urlForComponent(editor);
-
+    var url = this.state.editorPath || ComponentManager.get().urlForComponent(editor);
+    console.log('rendering editor from:', url)
     return (
       <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
         {this.editor.readonly &&
@@ -165,6 +195,7 @@ export default class ComponentView extends Component {
         }
         {url &&
           <WebView
+             originWhitelist={['*']}
              style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
              source={{uri: url}}
              key={this.editor.uuid}

@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
+import com.rnziparchive.RNZipArchivePackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
@@ -48,6 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
+            new RNZipArchivePackage(),
         new AsyncStoragePackage(),
         new RNCWebViewPackage(),
         new RNFileViewerPackage(),

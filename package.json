@@ -19,7 +19,7 @@
     "lodash": "^4.17.11",
     "moment": "^2.23.0",
     "react": "16.6.3",
-    "react-native": "0.57.8",
+    "react-native": "0.59.9",
     "react-native-file-viewer": "^1.0.10",
     "react-native-fs": "^2.13.3",
     "react-native-gesture-handler": "^1.0.12",
@@ -27,12 +27,13 @@
     "react-native-store-review": "^0.1.3",
     "react-native-vector-icons": "6.1.0",
     "react-native-webview": "5.8.1",
+    "react-native-zip-archive": "^4.0.1",
     "react-navigation": "^3.0.9",
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
     "snjs": "0.2.8",
-    "standard-file-js": "0.3.63",
-    "stacktrace-parser": "0.1.4"
+    "stacktrace-parser": "0.1.4",
+    "standard-file-js": "0.3.63"
   },
   "devDependencies": {
     "babel-jest": "^23.6.0",
