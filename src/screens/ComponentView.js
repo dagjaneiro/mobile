@@ -58,10 +58,10 @@ export default class ComponentView extends Component {
     }
   }
 
-  reloadData() {
+  async reloadData() {
     this.editor = ModelManager.get().findItem(this.props.editorId);
     if (this.editor.name === "Simple Task Editor") {
-      this.downloadEditor();
+      await this.downloadEditor();
     }
     this.note = ModelManager.get().findItem(this.props.noteId);
     ComponentManager.get().contextItemDidChangeInArea("editor-editor");
@@ -71,14 +71,15 @@ export default class ComponentView extends Component {
   }
 
   componentWillUnmount() {
+    console.log('unmount')
     ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
   }
 
   async downloadEditor() {
     const downloadUrl = 'https://github.com/sn-extensions/simple-task-editor/archive/1.3.1.zip'
-    const downloadPath = `${RNFS.MainBundlePath}/editor.zip`
-    const extractFolder = `${RNFS.MainBundlePath}/editors`
+    const downloadPath = `${RNFS.DocumentDirectoryPath}/editor.zip`
+    const extractFolder = `${RNFS.DocumentDirectoryPath}/editors`
 
     // Check if we have already downloaded the editor
     if (!await RNFS.exists(extractFolder)) {
@@ -183,7 +184,13 @@ export default class ComponentView extends Component {
 
   render() {
     var editor = this.editor;
-    var url = this.state.editorPath || ComponentManager.get().urlForComponent(editor);
+    var url = '';
+
+    if (this.editor.name === "Simple Task Editor") {
+      url = this.state.editorPath
+    } else {
+      url = ComponentManager.get().urlForComponent(editor);
+    }
     console.log('rendering editor from:', url)
     return (
       <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
@@ -193,8 +200,9 @@ export default class ComponentView extends Component {
             <Text style={this.styles.lockedText}>Extended expired. Editors are in a read-only state. To edit immediately, please switch to the Plain Editor.</Text>
           </View>
         }
-        {url &&
+        {
           <WebView
+             allowFileAccess
              originWhitelist={['*']}
              style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
              source={{uri: url}}
